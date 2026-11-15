@@ -20,7 +20,7 @@ public class ParCoolCompatAddon {
     public ParCoolCompatAddon(IEventBus modBus) {
         var forgeBus = NeoForge.EVENT_BUS;
         ExternalModManager.init(modBus, forgeBus);
-        if (FMLEnvironment.dist == Dist.CLIENT) {
+        if (FMLEnvironment.getDist() == Dist.CLIENT) {
             modBus.addListener(ParCoolCompatAddon::onClientSetup);
         }
     }

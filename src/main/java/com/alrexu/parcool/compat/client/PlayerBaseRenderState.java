@@ -3,26 +3,22 @@ package com.alrexu.parcool.compat.client;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-/** Tracks the base player-model portion of LivingEntityRenderer, excluding feature and armor layers. */
+/**
+ * Tracks when the base player model is being posed and drawn. Since 26.x that happens in the deferred
+ * ModelFeatureRenderer pass, separately from armor and other feature-layer models.
+ */
 public final class PlayerBaseRenderState {
-    private static final ThreadLocal<Deque<Scope>> SCOPES = ThreadLocal.withInitial(ArrayDeque::new);
+    private static final ThreadLocal<Deque<Boolean>> SCOPES = ThreadLocal.withInitial(ArrayDeque::new);
 
     private PlayerBaseRenderState() {
     }
 
-    public static void beginLivingRender(boolean playerModel) {
-        SCOPES.get().push(new Scope(playerModel));
+    public static void begin(boolean basePlayerModel) {
+        SCOPES.get().push(basePlayerModel);
     }
 
-    public static void finishBaseModel() {
-        Deque<Scope> scopes = SCOPES.get();
-        if (!scopes.isEmpty()) {
-            scopes.peek().baseModel = false;
-        }
-    }
-
-    public static void finishLivingRender() {
-        Deque<Scope> scopes = SCOPES.get();
+    public static void end() {
+        Deque<Boolean> scopes = SCOPES.get();
         if (!scopes.isEmpty()) {
             scopes.pop();
         }
@@ -32,15 +28,7 @@ public final class PlayerBaseRenderState {
     }
 
     public static boolean isRenderingBaseModel() {
-        Deque<Scope> scopes = SCOPES.get();
-        return !scopes.isEmpty() && scopes.peek().baseModel;
-    }
-
-    private static final class Scope {
-        private boolean baseModel;
-
-        private Scope(boolean baseModel) {
-            this.baseModel = baseModel;
-        }
+        Deque<Boolean> scopes = SCOPES.get();
+        return !scopes.isEmpty() && scopes.peek();
     }
 }

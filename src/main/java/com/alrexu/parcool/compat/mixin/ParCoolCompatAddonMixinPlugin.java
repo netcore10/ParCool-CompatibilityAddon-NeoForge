@@ -1,6 +1,6 @@
 package com.alrexu.parcool.compat.mixin;
 
-import net.neoforged.fml.loading.LoadingModList;
+import net.neoforged.fml.loading.FMLLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.tree.ClassNode;
@@ -12,20 +12,14 @@ import java.util.Set;
 
 public class ParCoolCompatAddonMixinPlugin implements IMixinConfigPlugin {
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final String SABLE_MIXIN =
-            "com.alrexu.parcool.compat.mixin.sable.WorldUtilSableCollisionMixin";
-    private static final String SABLE_CLIFF_JUMP_MIXIN =
-            "com.alrexu.parcool.compat.mixin.sable.CliffJumpSableMixin";
-    private static final String SABLE_CLING_RELEASE_MIXIN =
-            "com.alrexu.parcool.compat.mixin.sable.ClingReleaseSableMixin";
-    private static final String PLAYER_MODEL_COMPOSITION_MIXIN =
-            "com.alrexu.parcool.compat.mixin.client.PlayerModelAnimationCompositionMixin";
-    private static final String ANIMATION_APPLIER_COMPOSITION_MIXIN =
-            "com.alrexu.parcool.compat.mixin.client.AnimationApplierCompositionMixin";
+
+    private static final String PACKAGE = "com.alrexu.parcool.compat.mixin.client.";
+    private static final Set<String> PAL_MIXINS = Set.of(
+            PACKAGE + "PlayerModelPalCompositionMixin"
+    );
     private static final Set<String> EMF_MIXINS = Set.of(
-            "com.alrexu.parcool.compat.mixin.client.PlayerRendererFirstPersonStateMixin",
-            "com.alrexu.parcool.compat.mixin.client.LivingEntityRendererPlayerBaseStateMixin",
-            "com.alrexu.parcool.compat.mixin.client.PlayerModelEmfCompatMixin"
+            PACKAGE + "PlayerModelEmfCompatMixin",
+            PACKAGE + "ModelFeatureRendererPlayerBaseStateMixin"
     );
 
     @Override
@@ -39,49 +33,27 @@ public class ParCoolCompatAddonMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (SABLE_MIXIN.equals(mixinClassName)
-                || SABLE_CLIFF_JUMP_MIXIN.equals(mixinClassName)
-                || SABLE_CLING_RELEASE_MIXIN.equals(mixinClassName)) {
-            boolean sableLoaded = LoadingModList.get().getModFileById("sable") != null;
-            boolean parcool3Loaded = isParCool3Loaded();
-            boolean enabled = sableLoaded && parcool3Loaded;
-            LOGGER.info(
-                    "{} ParCool 3 + Sable mixin {} (Sable loaded: {}, ParCool 3 loaded: {})",
-                    enabled ? "Enabling" : "Skipping",
-                    mixinClassName,
-                    sableLoaded,
-                    parcool3Loaded
-            );
-            return enabled;
-        }
-        if (PLAYER_MODEL_COMPOSITION_MIXIN.equals(mixinClassName)
-                || ANIMATION_APPLIER_COMPOSITION_MIXIN.equals(mixinClassName)) {
-            boolean playerAnimatorLoaded = LoadingModList.get().getModFileById("playeranimator") != null;
-            boolean parcool3Loaded = isParCool3Loaded();
-            boolean enabled = playerAnimatorLoaded && parcool3Loaded;
-            LOGGER.info(
-                    "{} ParCool 3 + Player Animator composition mixin {}",
-                    enabled ? "Enabling" : "Skipping",
-                    mixinClassName
-            );
-            return enabled;
+        if (PAL_MIXINS.contains(mixinClassName)) {
+            return log("ParCool 3 + Player Animation Library composition mixin", mixinClassName, isLoaded("player_animation_library"));
         }
         if (EMF_MIXINS.contains(mixinClassName)) {
-            boolean emfLoaded = LoadingModList.get().getModFileById("entity_model_features") != null;
-            boolean parcool3Loaded = isParCool3Loaded();
-            boolean enabled = emfLoaded && parcool3Loaded;
-            LOGGER.info(
-                    "{} ParCool 3 + EMF render-scope mixin {}",
-                    enabled ? "Enabling" : "Skipping",
-                    mixinClassName
-            );
-            return enabled;
+            return log("ParCool 3 + EMF render-scope mixin", mixinClassName, isLoaded("entity_model_features"));
         }
         return true;
     }
 
+    private static boolean log(String what, String mixinClassName, boolean modLoaded) {
+        boolean enabled = modLoaded && isParCool3Loaded();
+        LOGGER.info("{} {} {}", enabled ? "Enabling" : "Skipping", what, mixinClassName);
+        return enabled;
+    }
+
+    private static boolean isLoaded(String modId) {
+        return FMLLoader.getCurrent().getLoadingModList().getModFileById(modId) != null;
+    }
+
     private static boolean isParCool3Loaded() {
-        return LoadingModList.get().getMods().stream()
+        return FMLLoader.getCurrent().getLoadingModList().getMods().stream()
                 .filter(info -> "parcool".equals(info.getModId()))
                 .map(info -> info.getVersion().toString())
                 .map(ParCoolCompatAddonMixinPlugin::parseMajorVersion)
@@ -100,7 +72,6 @@ public class ParCoolCompatAddonMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {
-
     }
 
     @Override
@@ -110,11 +81,9 @@ public class ParCoolCompatAddonMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
     }
 
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
     }
 }

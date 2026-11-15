@@ -11,6 +11,11 @@ public class CarryOnManager extends ModManager {
         forgeBus.register(EventHandlerForCarryOn.class);
     }
 
+    @Override
+    public void initInClient(IEventBus modBus, IEventBus forgeBus) {
+        if (isInstalled()) forgeBus.register(ClientEventHandlerForCarryOn.class);
+    }
+
     public boolean isCarrying(Player player) {
         if (!isInstalled()) return false;
         return CarryOnDataManager.getCarryData(player).isCarrying();

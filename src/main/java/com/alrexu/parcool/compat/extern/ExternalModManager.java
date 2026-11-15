@@ -12,7 +12,6 @@ import java.util.List;
 public class ExternalModManager {
     private static final List<String> V3_MANAGER_CLASSES = List.of(
             "com.alrexu.parcool.compat.extern.bettercombat.BetterCombatManager",
-            "com.alrexu.parcool.compat.extern.playeranimator.PlayerAnimatorManager",
             "com.alrexu.parcool.compat.extern.carryon.CarryOnManager"
     );
     private static List<IModManager> modManagers = List.of();
@@ -27,7 +26,7 @@ public class ExternalModManager {
         for (var manager : modManagers) {
             manager.init(modBus, forgeBus);
         }
-        if (FMLEnvironment.dist.isClient()) {
+        if (FMLEnvironment.getDist().isClient()) {
             modManagers.forEach(manager -> manager.initInClient(modBus, forgeBus));
         } else {
             modManagers.forEach(manager -> manager.initInDedicatedServer(modBus, forgeBus));

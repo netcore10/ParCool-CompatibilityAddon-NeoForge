@@ -1,5 +1,11 @@
 # ParCool+ / Compatibility Addon (NeoForge 1.21.1 fork)
 
+> **26.2 branch:** this branch targets Minecraft **26.2** / NeoForge **26.2.0.93** / ParCool **3.4.3.3** (26.2 port). Differences from the 1.21.1 notes below:
+> - **Sable / Create Aeronautics:** removed. Neither Create nor Sable exists for 26.x yet.
+> - **Player Animator → Player Animation Library (PAL) 1.2.9:** Better Combat 26.2 uses PAL. PAL already applies its animation after ParCool's pose, so the old defer-and-replay layer is gone; the addon only re-applies PAL when ParCool cancels `setupAnim` (charge-jump animations).
+> - **EMF/ETF:** the base player model is now posed and drawn in the deferred `ModelFeatureRenderer` pass, so the base-model scope lives there; the first-person hand uses EMF's own hand state.
+> - **Dependencies** come from Modrinth Maven, pinned to exact 26.2 version IDs in `gradle.properties` (no bundled `libs/` jars). ParCool is built from the local 26.2 port (`parcool_jar`).
+
 Addon for **[ParCool](https://www.curseforge.com/minecraft/mc-mods/parcool)** that smooths animation and gameplay interactions with a small set of third-party mods on **Minecraft 1.21.1** and **NeoForge**.
 
 This tree is a **fork** of the original compatibility addon, ported to NeoForge and trimmed to the integrations that matter for 1.21.1. Upstream mod and idea: ParCool / alRex_U.

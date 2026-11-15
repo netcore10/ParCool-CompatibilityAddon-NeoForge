@@ -2,22 +2,15 @@
   "required": true,
   "package": "com.alrexu.parcool.compat.mixin",
   "plugin": "com.alrexu.parcool.compat.mixin.ParCoolCompatAddonMixinPlugin",
-  "refmap": "parcool_compat_addon.refmap.json",
   "compatibilityLevel": "JAVA_21",
   "minVersion": "0.8",
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
-    "client.PlayerRendererFirstPersonStateMixin",
-    "client.LivingEntityRendererPlayerBaseStateMixin",
+    "client.ModelFeatureRendererPlayerBaseStateMixin",
     "client.PlayerModelEmfCompatMixin",
-    "client.PlayerModelAnimationCompositionMixin",
-    "client.AnimationApplierCompositionMixin"
+    "client.PlayerModelPalCompositionMixin"
   ],
-  "mixins": [
-    "sable.WorldUtilSableCollisionMixin",
-    "sable.CliffJumpSableMixin",
-    "sable.ClingReleaseSableMixin"
-  ]
+  "mixins": []
 }

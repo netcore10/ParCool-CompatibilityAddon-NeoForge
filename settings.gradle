@@ -6,8 +6,8 @@ pluginManagement {
 }
 
 plugins {
-    // Enables Gradle to auto-download the required Java toolchain (Java 21 for Minecraft 1.21.x)
-    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
+    // Enables Gradle to auto-download the required Java toolchain (Java 25 for Minecraft 26.x)
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
 }
 
 dependencyResolutionManagement {

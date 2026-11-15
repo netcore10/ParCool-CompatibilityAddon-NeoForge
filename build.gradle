@@ -1,26 +1,21 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '1.0.21'
+    id 'net.neoforged.moddev' version '2.0.148'
 }
 
 group = project.group
 version = "${minecraft_version}-${parcool_version}-${mod_version}"
+
 base {
     archivesName = 'ParCool-CompatibilityAddon'
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 repositories {
     mavenCentral()
-    maven { url = 'https://www.cursemaven.com' }
     maven { url = 'https://api.modrinth.com/maven' }
-    maven { url = 'https://maven.ryanhcode.dev/releases' }
 }
 
 neoForge {
@@ -28,9 +23,11 @@ neoForge {
     validateAccessTransformers = true
 
     runs {
-        client { client() }
+        client {
+            client()
+        }
         server { server() }
-        data { data() }
+        gameTestServer { type = "gameTestServer" }
     }
 
     mods {
@@ -41,111 +38,22 @@ neoForge {
 }
 
 dependencies {
-    // Prefer jars in libs/ (exact filenames from gradle.properties). If a file is missing, resolve the same
-    // mod from Modrinth Maven (versions in gradle.properties) so a clean clone still compiles.
+    compileOnly files(parcool_jar)
+    runtimeOnly files(parcool_jar)
 
-    if (file("libs/${parcool_jar}").exists()) {
-        compileOnly files("libs/${parcool_jar}")
-        runtimeOnly files("libs/${parcool_jar}")
-    } else {
-        def parcoolMr = "${minecraft_version}-${parcool_version}"
-        compileOnly "maven.modrinth:parcool:${parcoolMr}"
-        runtimeOnly "maven.modrinth:parcool:${parcoolMr}"
-    }
-
-    // Sable provides the runtime implementation. Compile only against its stable companion API.
-    compileOnly("dev.ryanhcode.sable-companion:sable-companion-common-${minecraft_version}:${sable_companion_version}") {
-        transitive = false
-    }
-    // Dev/runtime: load Sable in runClient so parkour-on-sub-level can be tested.
-    if (file("libs/${sable_jar}").exists()) {
-        runtimeOnly files("libs/${sable_jar}")
-    } else {
-        runtimeOnly "maven.modrinth:sable:${sable_modrinth_version}"
-    }
-
-    // Create + Create Aeronautics (uses Sable) for physics-vehicle testing in runClient.
-    if (file("libs/${create_jar}").exists()) {
-        runtimeOnly files("libs/${create_jar}")
-    } else {
-        runtimeOnly "maven.modrinth:create:${create_modrinth_version}"
-    }
-    if (file("libs/${create_aeronautics_jar}").exists()) {
-        runtimeOnly files("libs/${create_aeronautics_jar}")
-    } else {
-        runtimeOnly "maven.modrinth:create-aeronautics:${create_aeronautics_modrinth_version}"
-    }
-
-    // Punchy! first-person animations (client-only; runtime for runClient testing).
-    if (file("libs/${punchy_jar}").exists()) {
-        runtimeOnly files("libs/${punchy_jar}")
-    } else {
-        runtimeOnly "maven.modrinth:punchy-fpa:${punchy_modrinth_version}"
-    }
-
-    if (file("libs/${bettercombat_jar}").exists()) {
-        compileOnly files("libs/${bettercombat_jar}")
-        runtimeOnly files("libs/${bettercombat_jar}")
-    } else {
-        compileOnly "maven.modrinth:better-combat:${bettercombat_modrinth_version}"
-        runtimeOnly "maven.modrinth:better-combat:${bettercombat_modrinth_version}"
-    }
-
-    if (file("libs/${carryon_jar}").exists()) {
-        compileOnly files("libs/${carryon_jar}")
-        runtimeOnly files("libs/${carryon_jar}")
-    } else {
-        compileOnly "maven.modrinth:carry-on:${carryon_modrinth_version}"
-        runtimeOnly "maven.modrinth:carry-on:${carryon_modrinth_version}"
-    }
-
-    if (file("libs/${playeranimator_jar}").exists()) {
-        compileOnly files("libs/${playeranimator_jar}")
-        runtimeOnly files("libs/${playeranimator_jar}")
-    } else {
-        compileOnly "maven.modrinth:playeranimator:${playeranimator_modrinth_version}"
-        runtimeOnly "maven.modrinth:playeranimator:${playeranimator_modrinth_version}"
-    }
-
-    if (file("libs/${clothconfig_jar}").exists()) {
-        compileOnly files("libs/${clothconfig_jar}")
-        runtimeOnly files("libs/${clothconfig_jar}")
-    } else {
-        compileOnly "maven.modrinth:cloth-config:${clothconfig_modrinth_version}"
-        runtimeOnly "maven.modrinth:cloth-config:${clothconfig_modrinth_version}"
-    }
-
-    // EMF + ETF: optional; runtime uses reflection. Jars help IDE / compile checks when placed in libs/.
-    if (file("libs/${emf_jar}").exists()) {
-        compileOnly files("libs/${emf_jar}")
-    } else {
-        compileOnly "maven.modrinth:entity-model-features:${emf_modrinth_version}"
-    }
-    if (file("libs/${etf_jar}").exists()) {
-        compileOnly files("libs/${etf_jar}")
-    } else {
-        compileOnly "maven.modrinth:entitytexturefeatures:${etf_modrinth_version}"
-    }
-}
-
-// Ensure Punchy resource pack is present for runClient (run/ is gitignored).
-tasks.register('ensurePunchyResourcePack') {
-    def packDir = file('run/resourcepacks')
-    def packFile = new File(packDir, punchy_swords_pack_file)
-    outputs.file packFile
-    doLast {
-        if (!packFile.exists()) {
-            packDir.mkdirs()
-            new URL(punchy_swords_pack_url).withInputStream { input ->
-                packFile.withOutputStream { output -> output << input }
-            }
-            logger.lifecycle("Downloaded Punchy resource pack to ${packFile}")
-        }
-    }
-}
-
-tasks.named('prepareClientRun').configure {
-    dependsOn 'ensurePunchyResourcePack'
+    compileOnly "maven.modrinth:better-combat:${bettercombat_modrinth_version}"
+    runtimeOnly "maven.modrinth:better-combat:${bettercombat_modrinth_version}"
+    compileOnly "maven.modrinth:player-animation-library:${pal_modrinth_version}"
+    runtimeOnly "maven.modrinth:player-animation-library:${pal_modrinth_version}"
+    compileOnly "maven.modrinth:carry-on:${carryon_modrinth_version}"
+    runtimeOnly "maven.modrinth:carry-on:${carryon_modrinth_version}"
+    compileOnly "maven.modrinth:cloth-config:${clothconfig_modrinth_version}"
+    runtimeOnly "maven.modrinth:cloth-config:${clothconfig_modrinth_version}"
+    compileOnly "maven.modrinth:entity-model-features:${emf_modrinth_version}"
+    compileOnly "maven.modrinth:entitytexturefeatures:${etf_modrinth_version}"
+    // Dev-run only (not packaged): lets the EMF render-scope mixins load in runClient
+    runtimeOnly "maven.modrinth:entity-model-features:${emf_modrinth_version}"
+    runtimeOnly "maven.modrinth:entitytexturefeatures:${etf_modrinth_version}"
 }
 
 processResources {
@@ -154,12 +62,10 @@ processResources {
             mod_version          : mod_version,
             loader_version_range : loader_version_range,
             neo_version_range    : neo_version_range,
-            minecraft_version    : minecraft_version,
-            parcool_version      : parcool_version,
-            sable_version        : sable_version
+            minecraft_version_range: minecraft_version_range,
+            parcool_version      : parcool_version
     ]
     inputs.properties replaceProperties
-
     filesMatching('META-INF/neoforge.mods.toml') {
         expand replaceProperties
     }
@@ -168,26 +74,12 @@ processResources {
 jar {
     manifest {
         attributes([
-                "Specification-Title"          : "ParCool Compatibility Addon",
-                "Specification-Vendor"         : author,
-                "Specification-Version"        : mod_version,
-                "Implementation-Title"         : project.name,
-                "Implementation-Version"       : mod_version,
-                "Implementation-Vendor"        : author,
-                "Implementation-Timestamp"     : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                "Specification-Title"     : "ParCool Compatibility Addon",
+                "Specification-Vendor"    : author,
+                "Specification-Version"   : mod_version,
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : mod_version,
+                "Implementation-Vendor"   : author
         ])
-    }
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact jar
-        }
-    }
-    repositories {
-        maven {
-            url "file:///${project.projectDir}/mcmodsrepo"
-        }
     }
 }

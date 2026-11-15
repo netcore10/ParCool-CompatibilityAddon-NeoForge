@@ -23,7 +23,7 @@ side="BOTH"
 [[dependencies.${mod_id}]]
 modId="minecraft"
 type="required"
-versionRange="[1.21.1,1.22)"
+versionRange="${minecraft_version_range}"
 ordering="NONE"
 side="BOTH"
 
@@ -35,43 +35,36 @@ ordering="BEFORE"
 side="BOTH"
 
 [[dependencies.${mod_id}]]
-modId="sable"
-type="optional"
-versionRange="[${sable_version},3)"
-ordering="NONE"
-side="BOTH"
-
-[[dependencies.${mod_id}]]
 modId="bettercombat"
 type="optional"
-versionRange="[2.3.2+1.21.1,)"
+versionRange="[3.2.2,)"
 ordering="BEFORE"
 side="BOTH"
 
 [[dependencies.${mod_id}]]
 modId="carryon"
 type="optional"
-versionRange="[2.2.4,)"
+versionRange="[2.11.2,)"
 ordering="BEFORE"
 side="BOTH"
 
 [[dependencies.${mod_id}]]
-modId="playeranimator"
+modId="player_animation_library"
 type="optional"
-versionRange="[2.0.4+1.21.1,)"
+versionRange="[1.2.9,)"
 ordering="BEFORE"
-side="BOTH"
+side="CLIENT"
 
 [[dependencies.${mod_id}]]
 modId="entity_texture_features"
 type="optional"
-versionRange="[7.0.13,)"
+versionRange="[7.2.7,)"
 ordering="BEFORE"
 side="CLIENT"
 
 [[dependencies.${mod_id}]]
 modId="entity_model_features"
 type="optional"
-versionRange="[3.0.17,)"
+versionRange="[3.3.12,)"
 ordering="BEFORE"
 side="CLIENT"

@@ -6,8 +6,9 @@ import com.alrex.parcool.common.action.Action;
 import com.alrex.parcool.common.action.impl.FastRun;
 import com.alrex.parcool.common.action.impl.FastSwim;
 import com.alrexu.parcool.compat.ParCoolCompatAddon;
-import dev.kosmx.playerAnim.api.IPlayer;
-import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.player.PlayerModel;
+import traben.entity_model_features.models.animation.state.EMFEntityRenderState;
+import traben.entity_model_features.models.animation.state.EMFState;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.fml.ModList;
 import traben.entity_model_features.models.IEMFModel;
@@ -47,7 +48,7 @@ public final class EntityModelFeaturesCompat {
     }
 
     /** Selects EMF's vanilla state only on the renderer's base PlayerModel root. */
-    public static void preparePlayerModel(PlayerModel<?> model, Player player) {
+    public static void preparePlayerModel(PlayerModel model, Player player) {
         if (!isBasePlayerPass() || !gameplayAnimationOwnsPose(player)) {
             return;
         }
@@ -63,7 +64,16 @@ public final class EntityModelFeaturesCompat {
     }
 
     private static boolean isBasePlayerPass() {
-        return PlayerBaseRenderState.isRenderingBaseModel() || FirstPersonRenderState.isRenderingHand();
+        return PlayerBaseRenderState.isRenderingBaseModel() || isRenderingFirstPersonHand();
+    }
+
+    /**
+     * EMF animates the first-person arm both in AvatarRenderer#renderHand and again when the deferred
+     * model-part submit is drawn; its own render state carries the hand flag through both.
+     */
+    private static boolean isRenderingFirstPersonHand() {
+        EMFEntityRenderState state = EMFState.state();
+        return state != null && state.isFirstPersonHand();
     }
 
     /**
@@ -72,7 +82,7 @@ public final class EntityModelFeaturesCompat {
      * and automatically covers every ParCool 3.x animator without depending on a resource pack or action list.
      */
     private static boolean gameplayAnimationOwnsPose(Player player) {
-        boolean ownsPose = FirstPersonRenderState.isRenderingHand();
+        boolean ownsPose = isRenderingFirstPersonHand();
         Parkourability parkourability = Parkourability.get(player);
         boolean fastMovementAction = parkourability != null
                 && parkourability.isDoingAny(FastRun.class, FastSwim.class);
@@ -85,7 +95,7 @@ public final class EntityModelFeaturesCompat {
         if (nonFastAction || (parcoolAnimation != null && parcoolAnimation.hasAnimator() && !fastMovementAction)) {
             ownsPose = true;
         }
-        if (player instanceof IPlayer animatedPlayer && animatedPlayer.getAnimationStack().isActive()) {
+        if (PlayerAnimationLibraryState.isAnimating(player)) {
             ownsPose = true;
         }
 
