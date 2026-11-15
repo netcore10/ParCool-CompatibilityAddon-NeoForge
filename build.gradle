@@ -28,6 +28,11 @@ neoForge {
         }
         server { server() }
         gameTestServer { type = "gameTestServer" }
+
+        configureEach {
+            // The dependency mods still use logoFile; NeoForge shows a blocking warning screen for that in dev runs only
+            systemProperty "neoforge.warnings.logofile.hide", "true"
+        }
     }
 
     mods {
