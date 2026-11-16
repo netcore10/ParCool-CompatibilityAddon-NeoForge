@@ -3,6 +3,7 @@ package com.alrexu.parcool.compat;
 import com.alrexu.parcool.compat.extern.ExternalModManager;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
@@ -32,6 +33,9 @@ public class ParCoolCompatAddon {
     private static void registerClientOnlyCompat() {
         if (ParCoolVersion.current() != ParCoolVersion.V3) {
             return;
+        }
+        if (ModList.get().isLoaded("player_animation_library")) {
+            com.alrexu.parcool.compat.client.StepUpAnimations.register();
         }
         try {
             Class<?> compat = Class.forName(EMF_COMPAT_CLASS);
