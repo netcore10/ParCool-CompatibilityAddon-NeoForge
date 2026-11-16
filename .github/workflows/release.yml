@@ -1,0 +1,52 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # The addon compiles against ParCool 26.2, which isn't published anywhere: build it from the fork
+      - name: Checkout ParCool 26.2
+        uses: actions/checkout@v4
+        with:
+          repository: netcore10/ParCool
+          ref: '26.2'
+          path: parcool
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build ParCool
+        working-directory: parcool
+        run: bash ./gradlew --no-daemon build
+
+      - name: Build addon
+        run: |
+          PARCOOL_JAR=$(ls parcool/build/libs/ParCool-*-NF.jar | head -1)
+          echo "Using $PARCOOL_JAR"
+          bash ./gradlew --no-daemon -Pparcool_jar="$PWD/$PARCOOL_JAR" build
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ParCool Compatibility Addon ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            build/libs/*.jar
