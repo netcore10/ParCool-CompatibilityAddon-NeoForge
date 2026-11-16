@@ -10,8 +10,7 @@
   "client": [
     "client.ModelFeatureRendererPlayerBaseStateMixin",
     "client.PlayerModelEmfCompatMixin",
-    "client.PlayerModelPalCompositionMixin",
-    "client.VaultStepUpPalMixin"
+    "client.PlayerModelPalCompositionMixin"
   ],
   "mixins": []
 }

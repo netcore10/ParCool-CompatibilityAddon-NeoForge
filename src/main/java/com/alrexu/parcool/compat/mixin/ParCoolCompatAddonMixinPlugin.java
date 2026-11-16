@@ -15,8 +15,7 @@ public class ParCoolCompatAddonMixinPlugin implements IMixinConfigPlugin {
 
     private static final String PACKAGE = "com.alrexu.parcool.compat.mixin.client.";
     private static final Set<String> PAL_MIXINS = Set.of(
-            PACKAGE + "PlayerModelPalCompositionMixin",
-            PACKAGE + "VaultStepUpPalMixin"
+            PACKAGE + "PlayerModelPalCompositionMixin"
     );
     private static final Set<String> EMF_MIXINS = Set.of(
             PACKAGE + "PlayerModelEmfCompatMixin",
